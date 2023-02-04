@@ -48,13 +48,15 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function () use ($ro
         $router->post('/member', 'MemberController@create');
         $router->put('/member/{id}', 'MemberController@update');
         $router->delete('/member/{id}', 'MemberController@delete');
+
+        $router->put('/transaksi/{id}', 'TransaksiController@update');
+        $router->delete('/transaksi/{id}', 'TransaksiController@delete');
+
     });
 
     $router->get('/transaksi', 'TransaksiController@index');
     $router->get('/transaksi/{id}', 'TransaksiController@show');
     $router->post('/transaksi', 'TransaksiController@create');
-    $router->put('/transaksi/{id}', 'TransaksiController@update');
-    $router->delete('/transaksi/{id}', 'TransaksiController@delete');
     
     $router->get('/histori-transaksi', 'HistoriTransaksiController@index');
 
