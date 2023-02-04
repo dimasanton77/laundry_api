@@ -37,6 +37,12 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function () use ($ro
         $router->put('/role/{id}', 'RoleController@update');
         $router->delete('/role/{id}', 'RoleController@delete');
 
+        $router->get('/paket', 'PaketController@index');
+        $router->get('/paket/{id}', 'PaketController@show');
+        $router->post('/paket', 'PaketController@create');
+        $router->put('/paket/{id}', 'PaketController@update');
+        $router->delete('/paket/{id}', 'PaketController@delete');
+
         $router->get('/member', 'MemberController@index');
         $router->get('/member/{id}', 'MemberController@show');
         $router->post('/member', 'MemberController@create');

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Role;
+use App\Models\Paket;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 
-class RoleController extends Controller
+class PaketController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -21,8 +21,8 @@ class RoleController extends Controller
     }
 
     /**
-     * Get Roles Function
-     * @return roles
+     * Get Pakets Function
+     * @return pakets
      */
     public function index(Request $request)
     {
@@ -30,34 +30,37 @@ class RoleController extends Controller
 
         if ($acceptHeader === 'application/json' || $acceptHeader === 'application/xml') {
 
-            $roles = Role::orderBy('id', 'ASC')->paginate()->toArray();
+            $pakets = Paket::orderBy('id', 'ASC')->paginate()->toArray();
             
             if ($acceptHeader === 'application/json') {
                 $response = [
-                    'message' => 'Get Roles Success',
+                    'message' => 'Get Pakets Success',
                     'status_code' => Response::HTTP_OK,
                     'data' => [
-                        'total' => $roles['total'],
-                        'limit' => $roles['per_page'],
+                        'total' => $pakets['total'],
+                        'limit' => $pakets['per_page'],
                         'pagination' => [
-                            'next_page' => $roles['next_page_url'],
-                            'prev_page' => $roles['prev_page_url'],
-                            'current_page' => $roles['current_page']
+                            'next_page' => $pakets['next_page_url'],
+                            'prev_page' => $pakets['prev_page_url'],
+                            'current_page' => $pakets['current_page']
                         ],
-                        'data' => $roles['data']
+                        'data' => $pakets['data']
                     ]
                 ];
     
                 return response()->json($response, Response::HTTP_OK);
             } else {
-                $xml = new \SimpleXMLElement('<roles/>');
+                $xml = new \SimpleXMLElement('<pakets/>');
 
-                foreach ($roles['data'] as $item) {
+                foreach ($pakets['data'] as $item) {
                     // create xml
-                    $xmlItem = $xml->addChild('role');
-
+                    $xmlItem = $xml->addChild('paket');
                     $xmlItem->addChild('id', $item['id']);
                     $xmlItem->addChild('nama', $item['nama']);
+                    $xmlItem->addChild('lama_pengerjaan', $item['lama_pengerjaan']);
+                    $xmlItem->addChild('jenis_pengerjaan', $item['jenis_pengerjaan']);
+                    $xmlItem->addChild('jenis_cucian', $item['jenis_cucian']);
+                    $xmlItem->addChild('harga', $item['harga']);
                 }
 
                 return $xml->asXML();
@@ -73,37 +76,40 @@ class RoleController extends Controller
     }
 
     /**
-     * Show Role Function
+     * Show Paket Function
      */
     public function show(Request $request, $id)
     {
         $acceptHeader = $request->header('Accept');
 
         if ($acceptHeader === 'application/json' || $acceptHeader === 'application/xml') {
-            $role = Role::find($id);
+            $paket = Paket::find($id);
 
-            if (isset($role)) {
+            if (isset($paket)) {
 
                 if ($acceptHeader === 'application/json') {
                     $response = [
-                        'message' => 'Get Role Success',
+                        'message' => 'Get Paket Success',
                         'status_code' => Response::HTTP_OK,
-                        'data' => $role
+                        'data' => $paket
                     ];
         
                     return response()->json($response, Response::HTTP_OK);
                 } else {
-                    $xml = new \SimpleXMLElement('<role/>');
+                    $xml = new \SimpleXMLElement('<paket/>');
 
-                    $xml->addChild('id', $role->id);
-                    $xml->addChild('nama', $role->nama);
-
+                    $xml->addChild('id', $paket->id);
+                    $xml->addChild('nama', $paket->nama);
+                    $xml->addChild('lama_pengerjaan', $paket->lama_pengerjaan);
+                    $xml->addChild('jenis_pengerjaan', $paket->jenis_pengerjaan);
+                    $xml->addChild('jenis_cucian', $paket->jenis_cucian);
+                    $xml->addChild('harga', $paket->harga);
                     return $xml->asXML();
                 }
 
             } else {
                 $response = [
-                    'message' => 'Role Not Found',
+                    'message' => 'Paket Not Found',
                     'status_code' => Response::HTTP_NOT_FOUND
                 ];
         
@@ -120,7 +126,7 @@ class RoleController extends Controller
     }
 
      /**
-     * Create Role Function
+     * Create Paket Function
      */
     public function create(Request $request)
     {
@@ -131,7 +137,11 @@ class RoleController extends Controller
             $input = $request->all();
 
             $validationRules = [
-                'nama' => 'required|string|max:50|unique:role'
+                'nama' => 'required|string|max:100|unique:paket',
+                'lama_pengerjaan' => 'required|integer',
+                'jenis_pengerjaan' => 'required|string|max:200',
+                'jenis_cucian' => 'required|string|max:100',
+                'harga' => 'required|integer',
             ];
 
             $validator = Validator::make($input, $validationRules);
@@ -140,30 +150,37 @@ class RoleController extends Controller
                 return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
             }
 
-            $role = new Role();
+            $paket = new Paket();
 
-            $role->nama = $input['nama'];
+            $paket->nama = $input['nama'];
+            $paket->lama_pengerjaan = $input['lama_pengerjaan'];
+            $paket->jenis_pengerjaan = $input['jenis_pengerjaan'];
+            $paket->jenis_cucian = $input['jenis_cucian'];
+            $paket->harga = $input['harga'];
 
-            if ($role->save()) {
+            if ($paket->save()) {
 
                 if ($acceptHeader === 'application/json') {
                     $response = [
-                        'message' => 'Create Role Success',
+                        'message' => 'Create Paket Success',
                         'status_code' => Response::HTTP_CREATED,
-                        'data' => $role
+                        'data' => $paket
                     ];
         
                     return response()->json($response, Response::HTTP_CREATED);
                 } else {
-                    $xml = new \SimpleXMLElement('<role/>');
-
-                    $xml->addChild('id', $role->id);
-                    $xml->addChild('nama', $role->nama);
+                    $xml = new \SimpleXMLElement('<paket/>');
+                    $xml->addChild('id', $paket->id);
+                    $xml->addChild('nama', $paket->nama);
+                    $xml->addChild('lama_pengerjaan', $paket->lama_pengerjaan);
+                    $xml->addChild('jenis_pengerjaan', $paket->jenis_pengerjaan);
+                    $xml->addChild('jenis_cucian', $paket->jenis_cucian);
+                    $xml->addChild('harga', $paket->harga);
                     return $xml->asXML();
                 }
             } else {
                 $response = [
-                    'message' => 'Create Role Failed',
+                    'message' => 'Create Paket Failed',
                     'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR
                 ];
         
@@ -180,7 +197,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Update Role Function
+     * Update Paket Function
      */
     public function update(Request $request, $id)
     {
@@ -190,7 +207,11 @@ class RoleController extends Controller
             $input = $request->all();
 
             $validationRules = [
-                'nama' => 'required|string|max:50|unique:role,nama,'. $id
+                'nama' => 'required|string|max:50|unique:paket,nama,'. $id,
+                'lama_pengerjaan' => 'required|integer',
+                'jenis_pengerjaan' => 'required|string|max:200',
+                'jenis_cucian' => 'required|string|max:100',
+                'harga' => 'required|integer',
             ];
 
             $validator = Validator::make($input, $validationRules);
@@ -199,32 +220,38 @@ class RoleController extends Controller
                 return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
             }
             
-            $role = Role::find($id);
+            $paket = Paket::find($id);
 
-            if (isset($role)) {
-                $role->nama = $input['nama'];
+            if (isset($paket)) {
+                $paket->nama = $input['nama'];
+                $paket->lama_pengerjaan = $input['lama_pengerjaan'];
+                $paket->jenis_pengerjaan = $input['jenis_pengerjaan'];
+                $paket->jenis_cucian = $input['jenis_cucian'];
+                $paket->harga = $input['harga'];
 
-                if ($role->save()) {
+                if ($paket->save()) {
 
                     if ($acceptHeader === 'application/json') {
                         $response = [
-                            'message' => 'Update Role Success',
+                            'message' => 'Update Paket Success',
                             'status_code' => Response::HTTP_OK,
-                            'data' => $role
+                            'data' => $paket
                         ];
             
                         return response()->json($response, Response::HTTP_OK);
                     } else {
-                        $xml = new \SimpleXMLElement('<role/>');
-
-                        $xml->addChild('id', $role->id);
-                        $xml->addChild('nama', $role->nama);
-
+                        $xml = new \SimpleXMLElement('<paket/>');
+                        $xml->addChild('id', $paket->id);
+                        $xml->addChild('nama', $paket->nama);
+                        $xml->addChild('lama_pengerjaan', $paket->lama_pengerjaan);
+                        $xml->addChild('jenis_pengerjaan', $paket->jenis_pengerjaan);
+                        $xml->addChild('jenis_cucian', $paket->jenis_cucian);
+                        $xml->addChild('harga', $paket->harga);
                         return $xml->asXML();
                     }
                 } else {
                     $response = [
-                        'message' => 'Create Role Failed',
+                        'message' => 'Create Paket Failed',
                         'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR
                     ];
             
@@ -232,7 +259,7 @@ class RoleController extends Controller
                 }
             } else {
                 $response = [
-                    'message' => 'Role Not Found',
+                    'message' => 'Paket Not Found',
                     'status_code' => Response::HTTP_NOT_FOUND
                 ];
         
@@ -249,36 +276,36 @@ class RoleController extends Controller
     }
 
     /**
-     * Delete Role Function
+     * Delete Paket Function
      */
     public function delete(Request $request, $id)
     {
         $acceptHeader = $request->header('Accept');
 
         if ($acceptHeader === 'application/json' || $acceptHeader === 'application/xml') {
-            $role = Role::find($id);
+            $paket = Paket::find($id);
 
-            if (isset($role)) {
-                if ($role->delete()) {
+            if (isset($paket)) {
+                if ($paket->delete()) {
 
                     if ($acceptHeader === 'application/json') {
                         $response = [
-                            'message' => 'Delete Role Success',
+                            'message' => 'Delete Paket Success',
                             'status_code' => Response::HTTP_OK
                         ];
             
                         return response()->json($response, Response::HTTP_OK);
                     } else {
-                        $xml = new \SimpleXMLElement('<role/>');
+                        $xml = new \SimpleXMLElement('<paket/>');
 
-                        $xml->addChild('message', 'Delete Role Success');
+                        $xml->addChild('message', 'Delete Paket Success');
                         $xml->addChild('status_code', Response::HTTP_OK);
 
                         return $xml->asXML();
                     }
                 } else {
                     $response = [
-                        'message' => 'Delete Role Failed',
+                        'message' => 'Delete Paket Failed',
                         'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR
                     ];
         
@@ -286,7 +313,7 @@ class RoleController extends Controller
                 }
             } else {
                 $response = [
-                    'message' => 'Role Not Found',
+                    'message' => 'Paket Not Found',
                     'status_code' => Response::HTTP_NOT_FOUND
                 ];
         
