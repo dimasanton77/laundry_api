@@ -62,7 +62,7 @@ $router->group(['middleware' => 'auth', 'prefix' => 'api'], function () use ($ro
     $router->get('/histori-transaksi/{id}', 'HistoriTransaksiController@show');
 
 
-    $router->get('/profile/{id}', 'ProfileController@show');
-    $router->put('/profile/{id}', 'ProfileController@update');
+    $router->get('/profile', 'ProfileController@show');
+    $router->put('/profile', 'ProfileController@update');
 
 });
