@@ -52,8 +52,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * Relation to Products
      */
-    public function products()
+
+     public function role()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasOne(Role::class,'id','role_id');
     }
+
 }

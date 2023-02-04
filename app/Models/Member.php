@@ -18,4 +18,8 @@ class Member extends Model
     protected $hidden = [
     ];
 
+    public function pengguna()
+    {
+        return $this->hasOne(User::class,'id','pengguna_id');
+    }
 }
